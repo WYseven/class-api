@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="/vue.js"></script>
+    <script src="/jquery-3.2.1.js"></script>
+  </head>
+  <body>
+      <div>
+        <p>姓名：<input type="text" name='userName' /></p>
+        <p>年龄：<input type="text" name='age' /></p>
+        <p>性别：
+          <select name="sex" id="">
+            <option value="男">男</option>
+            <option value="女">女</option>
+            <option value="不确定">不确定</option>
+          </select>
+        </p>
+        <input type="button" id="addInfo" value="增加" />
+        <hr>
+        <div id="box">
+
+        </div>
+      </div>
+      <script>
+
+        $.ajax({
+          url:'/api/getAllUsers',
+          success(data){
+            let html = data.users.map((data) => {
+              return `<p>${data._id}<input data-id="${data._id}" type="button" value="删除" /></p>`
+            })
+            $("#box").html(html.join(""));
+
+            let inputs = $("#box input");
+
+            inputs.click(function(){
+              console.log(this.dataset)
+              $.ajax({
+                url:"/api/delectUser",
+                data:{
+                  id:this.dataset.id
+                },
+                success: (data) => {
+                  console.log(data)
+                  this.parentNode.remove();
+                }
+              })
+            })
+
+          }
+        })
+        
+        $('#addInfo').click(() => {
+          $.ajax({
+            url: 'http://localhost:8888/api/saveUsers',
+            method: 'post',
+            data: {
+              userName: $("input[name='userName']").val(),
+              age: $("input[name='age']").val(),
+              sex: $("select[name='sex']").val(),
+            },
+            success(data) {
+              console.log(data)
+            }
+          })
+        })
+        
+
+      </script>
+  </body>
+</html>
