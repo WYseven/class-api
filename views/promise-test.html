@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="/vue.js"></script>
+    <script src="/jquery-3.2.1.js"></script>
+  </head>
+  <body>
+      
+      <input type="button" value="去获取数据" />
+      <script>
+
+        /* $.ajax({
+          url: 'http://localhost:8888/promise/userName',
+          success(data){
+            console.log(data)
+            $.ajax({
+              url: 'http://localhost:8888/promise/shopListById',
+              method: 'post',
+              success(data){
+                console.log(data)
+                $.ajax({
+                  url: 'http://localhost:8888/promise/dress',
+                  success(data){
+                    console.log(data)
+                  }
+                })
+              }
+            })
+          }
+        }) */
+
+        /*
+        
+        1. ajax是异步的，所以不能避免的要把返回的结果写在回调函数中，这会有函数的嵌套
+        2. 向后端请求几个接口，会形成回调地狱
+        3. 必须等两个ajax回来之后才能执行
+
+        处理异步问题
+        处理多异步回调的串行处理
+        对个异步回调的并行处理
+
+        流水线一样的处理
+         */
+        
+        function getApiPromise(url,method){
+          return new Promise((resolve, reject) => {
+            $.ajax({
+              url: url,
+              method: method || 'get',
+              success: resolve,
+              error: reject
+            });
+          })
+        }
+        // 串行处理
+        /*getApiPromise('http://localhost:8888/promise/userName')
+        .then((data) => {
+          console.log(data)
+          return getApiPromise('http://localhost:8888/promise/shopListById', 'post')
+        })
+        .then((data) => {
+          console.log(data)
+        })
+        .catch((error) => {
+          console.log(error)
+        })*/
+
+        // 并行处理
+        /*let arr = [
+          getApiPromise('http://localhost:8888/promise/userName3'),
+          getApiPromise('http://localhost:8888/promise/shopListById', 'post')
+        ]
+        
+        Promise.all(arr)
+        .then((data) => {
+          console.log(data)
+        })
+        .catch((error) => {
+          console.log(error)
+        })*/
+
+        /*
+        
+        async 用来声明函数是异步的
+        await 用来等待一个异步方法执行完成
+         */
+        
+         /*async
+
+          async标记的函数返回的是一个 Promise 对象。
+          在没有 await 的情况下执行 async 函数，它会立即执行，返回一个 Promise 对象，并且不会阻塞后面的语句。
+          如果在函数中 return 一个直接量，async 会把这个直接量通过 Promise.resolve() 封装成 Promise 对象。async function testAsync() {return "hello async";}
+
+          await
+
+          如果它等到的不是一个 Promise 对象，那 await 表达式的运算结果就是它等到的东西。
+          如果它等到的是一个 Promise 对象，await会阻塞后面的代码，等着 Promise 对象 resolve，然后得到 resolve 的值，作为 await 表达式的运算结果。
+          await 只能出现在 async 函数中*/
+
+          async function fn(){
+            let d1 = await getApiPromise('http://localhost:8888/promise/userName')
+            let d2 = await getApiPromise('http://localhost:8888/promise/shopListById', 'post')
+            
+            return [d1,d2]
+            // console.log(123)
+          }
+
+          fn().then((data) => {
+            console.log(data)
+          });
+          console.log(456)
+
+
+      </script>
+  </body>
+</html>
